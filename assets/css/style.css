@@ -1,0 +1,19 @@
+body, html {
+    background-image: url(assets/images/43868-Charmander-Bulbasaur-Squirtle-GameBoy.jpg) no-repeat center center fixed; 
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    }
+    
+
+h4 {
+    font-family: 'Hi Melody', cursive;
+    text-align: center;
+    font-size: 35px;
+    color: rgba(71, 69, 85, 0.712);
+}
+
+p {
+    text-align: right;
+}

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="UTF-8">
+        <title>GIPHY API</title>
+
+        <!-- link to Bootstrap-->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+        <!-- links to jQuery Library -->
+        <script src="https://code.jquery.com/jquery-3.1.1.js"></script>
+
+        <!-- Latest compiled and minified CSS (Bootstrap) -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  <!-- Optional theme (Bootstrap) -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+   <!-- google fonts --><link href="https://fonts.googleapis.com/css?family=Hi+Melody" rel="stylesheet">
+<!-- CSS -->
+<link rel="stylesheet" href="assets/css/style.css" />
+
+</head>
+<body background="assets/images/43868-Charmander-Bulbasaur-Squirtle-GameBoy.jpg" >
+
+
+<h4 class="text-center" style="font-family: 'Hi Melody', cursive;">Welcome! Choose your favorite Pokemon. Don't see it? That's okay. <br> Just add your Pokemon with the search bar below. Happy Pokemon hunting!</p>
+
+<!-- This will be where the buttons are added and displayed. -->
+<div id="buttonItems"></div>
+<br>
+<br>
+
+<!-- add form to add a pokemon button to the array. -->
+<form>
+    <div class="row">
+        <div class="text-center" "col-md-3">
+            <input type="text" id="pokemon-input" class="text-center" "form-control" placeholder="Choose your Pokemon...">
+        </div>
+       
+        <input id="addpokemonThing" type="submit" class="btn btn-success" value="SEARCH POKEMON!">
+        <!-- If there are any error messages, they will appear here -->
+        <span id="entry" style="color: white; background: red"></span>
+    </div>
+</form>
+
+<!-- Ratings -->
+<div id="ratings"></div>
+
+
+<script type="text/javascript">
+
+    //initial array.
+	var pokemonStuff = ["Pikachu", "Bulbasaur", "Raichu", "Charmander", "Squirtle", "Charizard", "JigglyPuff", "Snorlax", "Vulpix", "Alakazam"];
+    var pokemonImage = "";
+
+// function shows all the buttons
+function showButtons () {
+    $("#buttonItems").empty();
+    $("#pokemon-input").val("");
+
+    for (var i = 0; i < pokemonStuff.length; i++) {
+        var button = $("<button class='btn btn-primary'>");
+        button.addClass("pokemon");
+        button.attr("pokemon-name", pokemonStuff[i]);
+        button.text(pokemonStuff[i]);
+        $("#buttonItems").append(button);
+        $("#buttonItems").append(" ");
+    }
+}
+
+showButtons();
+
+// "Search Pokemon" button is clicked.
+$("#addpokemonThing").on("click", function(event) {
+    $("#entry").empty();
+    event.preventDefault();
+    var pokemonInput = $("#pokemon-input").val().trim();
+    var pokemonTerm = $(this).attr("pokemon-name");
+
+    // 10 gifs to be shown
+    var queryURL = "https://api.giphy.com/v1/gifs/search?q=" + pokemonInput + "&limit=10&api_key=dc6zaTOxFJmzC";
+
+        $.ajax({ url: queryURL, method: "GET"}).done(function(response) {
+
+        if (response.pagination.total_count >= 10) {
+            pokemonStuff.push(pokemonInput);
+            showButtons(); }
+        else if (response.pagination.total_count === 0) {
+            $("#entry").html(" Sorry, there were no results for this.  Please try again."); }
+        else if (response.pagination.total_count === 1) { $("#entry").html(" Sorry, please try again."); }
+        else { $("#entry").html(" Sorry, there were only " + response.pagination.total_count + " results for this.  Please try again."); }
+        $("#pokemon-input").val("");
+        });
+
+});
+
+$(document).on("click", ".pokemon", display);
+
+function display() {
+
+    //  clear out error message
+    $("#entry").empty();
+
+    var pokemonTerm = $(this).attr("pokemon-name");
+
+    // The GIPHY query. This limits to 10 results
+    var queryURL = "https://api.giphy.com/v1/gifs/search?api_key=OBhG02Onbo6Oj2hlacczxLuQlFC9DoMu&q=" + pokemonTerm + "&limit=10&offset=0&rating=G&lang=en";
+
+    $.ajax({ url: queryURL, method: "GET"}).done(function(response) {
+
+        
+        for (var j = 0; j < response.data.length; j++) {
+
+            // animated gif URL
+            var active = response.data[j].images.fixed_width.url;
+            // still gif URL
+            var still = response.data[j].images.fixed_width_still.url;
+            var rating = "Rating: " + (response.data[j].rating).toUpperCase();
+
+            // makes new img item
+            var pokemonImage = $("<img>");
+
+            // I think I'm going to make the color of ratings purple
+            $("#ratings").css("color", "purple");
+
+            // div keeps same size
+            var ratingDiv = $("<div id='ratingDiv'>" + rating + "</div>");
+            $(ratingDiv).css({"text-align":"center", "font-size":"20px", "width":"200", "display":"block"});
+
+            pokemonImage.attr({"active":active, "still":still, "src":still, "state":"still"});
+
+            
+            var ratingAndImage = $("<div>");
+            $(ratingAndImage).css({"float":"left"});
+            $(ratingAndImage).prepend(ratingDiv, pokemonImage);
+
+           
+            $("#ratings").prepend(ratingAndImage);
+
+            // This starts and stop the gif.
+            $(pokemonImage).on("click", function(event) {
+
+                // This clear out error message
+                $("#entry").empty();
+
+                var state = $(this).attr("state");
+                var source = $(this).attr("src");
+
+                if (state === "still") {
+                $(this).attr("src", $(this).attr("active"));
+                $(this).attr("state", "active"); }
+                else {
+                $(this).attr("src", $(this).attr("still"));
+                $(this).attr("state", "still"); }
+            });
+
+        }
+
+   });
+
+}
+
+</script>
+<br><br><br><br><br><br><br><br><br><br><br>
+<p>&#169; Christina Thach</p>
+</body>
+</html>

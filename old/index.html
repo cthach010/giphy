@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Pokedex</title>
+      <!-- Added a link to Bootstrap-->
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+        
+      <!-- This links to the jQuery Library -->
+      <script src="https://code.jquery.com/jquery-3.1.1.js"></script>
+</head>
+
+<body>
+
+<body background="http://gran4u.xtgem.com/Pokedex.png" background>
+    
+
+    <!-- buttons for pokemon -->
+  <button data-pokemon="Pikachu"> Pikachu</button>
+  <button data-pokemon="Charmander">Charmander</button>
+  <button data-pokemon="Squirtle">Squirtle</button>
+  <button data-pokemon="Bulbasaur">Bulbasaur</button>
+  <button data-pokemon="Jigglypuff">Jigglypuff</button>
+  <button data-pokemon="Vulpix">Vulpix</button>
+  <button data-pokemon="Mewtwo">Mewtwo</button>
+  <button data-pokemon="Snorlax">Snorlax</button>
+  <button data-pokemon="Charizard">Charizard</button>
+  <button data-pokemon="Chansey">Chansey</button>
+
+<!-- This is the form to add a space-themed button to the array. -->
+  <form>
+    <div class="row">
+        <div class="col-md-3">
+            <input type="text" id="pokemon-input" class="form-control" placeholder="Add a Pokemon">
+        </div>
+        <input id="searchforapokemon" type="submit" class="btn btn-success" value="Search Pokedex">
+        <!-- If there are any error messages, they will appear here -->
+        <span id="entry" style="color: white; background: red"></span>
+    </div>
+</form>
+<script>
+
+
+</script>
+
+
+
+  <div id="gifs-appear-here">
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script type="text/javascript">
+    // Event listener for all button elements
+    $("button").on("click", function() {
+      // In this case, the "this" keyword refers to the button that was clicked
+      var pokemon = $(this).attr("data-pokemon");
+
+      // Constructing a URL to search Giphy for the name of the person who said the quote
+      var queryURL = "https://api.giphy.com/v1/gifs/search?q=" +
+        pokemon + "&api_key=dc6zaTOxFJmzC&limit=10";
+
+      // Performing our AJAX GET request
+      $.ajax({
+        url: queryURL,
+        method: "GET"
+      })
+        // After the data comes back from the API
+        .then(function(response) {
+          // Storing an array of results in the results variable
+          var results = response.data;
+
+          // Looping over every result item
+          for (var i = 0; i < results.length; i++) {
+
+            // Only taking action if the photo has an appropriate rating
+            if (results[i].rating !== "r" && results[i].rating !== "pg-13") {
+              // Creating a div with the class "item"
+              var gifDiv = $("<div class='item'>");
+
+              // Storing the result item's rating
+              var rating = results[i].rating;
+
+              // Creating a paragraph tag with the result item's rating
+              var p = $("<p>").text("Rating: " + rating);
+
+              // Creating an image tag
+              var pokemonImage = $("<img>");
+
+              // Giving the image tag an src attribute of a proprty pulled off the
+              // result item
+              pokemonImage.attr("src", results[i].images.fixed_height.url);
+
+              // Appending the paragraph and personImage we created to the "gifDiv" div we created
+              gifDiv.append(p);
+              gifDiv.append(pokemonImage);
+
+              // Prepending the gifDiv to the "#gifs-appear-here" div in the HTML
+              $("#gifs-appear-here").prepend(gifDiv);
+            }
+          }
+        });
+    });
+  </script>
+</body>
+
+</html>
